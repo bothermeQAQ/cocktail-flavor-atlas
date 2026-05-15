@@ -1,0 +1,1310 @@
+/* =========================================================
+   Cocktail Flavor Atlas — A Recipe Grimoire
+   Aged artifact redesign (v2): burnt edges, sigils,
+   candle dust, magical ink reveals.
+   ========================================================= */
+
+:root {
+    /* Parchment — older, more amber, with deeper midtones */
+    --parchment:        #e6d09e;
+    --parchment-light:  #efddae;
+    --parchment-warm:   #dcc081;
+    --parchment-dark:   #c2a164;
+    --parchment-stain:  #a17a3e;
+
+    /* Ink — sepia, slightly cooler */
+    --ink:              #261608;
+    --ink-soft:         #432a14;
+    --ink-faint:        #7a5a30;
+    --ink-line:         #946d3b;
+
+    /* Burgundy / wax */
+    --burgundy:         #6b1d10;
+    --burgundy-dark:    #3e1008;
+    --burgundy-deep:    #220603;
+    --burgundy-bright:  #8a2818;
+
+    /* Brass */
+    --gold:             #826227;
+    --gold-soft:        #a8854a;
+    --gold-bright:      #c19c54;
+    --gold-pale:        #ddc086;
+
+    /* Rules */
+    --rule:             #946c3b;
+    --rule-faint:       #b69464;
+
+    --disabled:         #ad9472;
+
+    /* Leather */
+    --leather:          #170c05;
+    --leather-light:    #261509;
+    --leather-shadow:   #080403;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+/* ---------- Body: dark wood tavern table ---------- */
+body {
+    font-family: 'EB Garamond', Georgia, 'Times New Roman', serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--ink);
+    background-color: var(--leather);
+    background-image:
+        /* Candle glow above the book */
+        radial-gradient(ellipse 900px 600px at 50% -8%, rgba(220,150,80,0.13) 0%, transparent 60%),
+        /* Side glows */
+        radial-gradient(ellipse at 8% 25%, rgba(180,120,60,0.08) 0%, transparent 55%),
+        radial-gradient(ellipse at 92% 75%, rgba(140,80,40,0.07) 0%, transparent 55%),
+        /* Tavern table vignette */
+        radial-gradient(ellipse 1400px 800px at 50% 50%, rgba(40,20,10,0) 0%, rgba(10,5,2,0.5) 100%),
+        /* Wood grain — fine vertical streaks */
+        repeating-linear-gradient(
+            92deg,
+            rgba(0,0,0,0) 0 14px,
+            rgba(0,0,0,0.28) 14px 15px,
+            rgba(0,0,0,0) 15px 32px,
+            rgba(255,200,140,0.025) 32px 33px),
+        /* Wider plank lines */
+        repeating-linear-gradient(
+            88deg,
+            rgba(0,0,0,0) 0 70px,
+            rgba(0,0,0,0.22) 70px 71px,
+            rgba(0,0,0,0) 71px 160px);
+    background-attachment: fixed;
+    min-height: 100vh;
+    padding: 3.5rem 1rem 4.5rem;
+}
+
+/* ---------- Leather table wrapper (holds under-leaves) ---------- */
+.leather-table {
+    max-width: 1180px;
+    margin: 0 auto;
+    position: relative;
+    perspective: 2400px;
+}
+
+/* Sister pages peeking out from under the main grimoire */
+.under-leaf {
+    position: absolute;
+    inset: 0;
+    background-color: var(--parchment-warm);
+    background-image:
+        radial-gradient(ellipse at 30% 50%, rgba(120,70,25,0.25) 0%, transparent 60%),
+        radial-gradient(ellipse at 70% 50%, rgba(60,30,10,0.35) 0%, transparent 70%);
+    border-radius: 1px;
+    pointer-events: none;
+    z-index: 0;
+    box-shadow:
+        0 0 0 1px rgba(80,50,20,0.6),
+        0 2px 4px rgba(0,0,0,0.4),
+        0 24px 60px rgba(0,0,0,0.55);
+}
+.under-leaf-1 {
+    transform: rotate(-0.5deg) translate(8px, 14px);
+    filter: brightness(0.82) saturate(0.7);
+}
+.under-leaf-2 {
+    transform: rotate(0.8deg) translate(-14px, 24px);
+    filter: brightness(0.65) saturate(0.6);
+}
+
+/* ---------- The grimoire (parchment page) ---------- */
+.grimoire {
+    position: relative;
+    isolation: isolate;
+    z-index: 1;
+    padding: 5.5rem clamp(1.75rem, 5.5vw, 5.5rem) 4rem;
+
+    background-color: var(--parchment);
+    background-image:
+        /* Center candlelight */
+        radial-gradient(ellipse at 50% 32%, rgba(255,235,180,0.36) 0%, transparent 50%),
+        /* Foxing — top-left */
+        radial-gradient(ellipse 380px 280px at 6% 4%, rgba(140,70,20,0.32) 0%, transparent 60%),
+        /* Tea stain — bottom-right */
+        radial-gradient(ellipse 480px 340px at 96% 96%, rgba(110,55,20,0.28) 0%, transparent 60%),
+        /* Smaller foxing spots */
+        radial-gradient(circle at 22% 78%, rgba(120,70,25,0.16) 0%, transparent 12%),
+        radial-gradient(circle at 78% 18%, rgba(120,70,25,0.13) 0%, transparent 10%),
+        radial-gradient(circle at 88% 42%, rgba(110,60,20,0.11) 0%, transparent 9%),
+        radial-gradient(circle at 14% 52%, rgba(110,60,20,0.09) 0%, transparent 8%),
+        radial-gradient(circle at 58% 88%, rgba(100,50,15,0.10) 0%, transparent 7%),
+        /* Edge vignette */
+        radial-gradient(ellipse at 50% 50%, transparent 50%, rgba(60,30,10,0.32) 100%);
+
+    /* Layered frame */
+    box-shadow:
+        inset 0 0 140px rgba(80,40,15,0.32),
+        inset 0 0 0 1px rgba(140,100,55,0.55),
+        inset 0 0 0 5px var(--parchment-warm),
+        inset 0 0 0 6px var(--gold),
+        0 0 0 1px var(--gold-bright),
+        0 0 0 2px var(--gold),
+        0 0 0 5px var(--leather-light),
+        0 0 0 6px var(--gold),
+        0 0 0 14px var(--leather),
+        0 0 0 15px var(--leather-shadow),
+        0 50px 120px rgba(0,0,0,0.75),
+        0 18px 40px rgba(0,0,0,0.55),
+        0 4px 8px rgba(0,0,0,0.45);
+
+    border-radius: 1px;
+}
+
+/* ---------- Texture layers ---------- */
+.page-grain,
+.page-stains,
+.page-cracks,
+.burnt-frame,
+.candle-dust {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.page-grain {
+    opacity: 0.6;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='5' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.16  0 0 0 0 0.09  0 0 0 0 0.03  0 0 0 0.40 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    background-size: 240px 240px;
+}
+
+.page-stains {
+    opacity: 0.38;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 600'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.018' numOctaves='3' seed='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.32  0 0 0 0 0.18  0 0 0 0 0.06  0 0 0 0.48 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    background-size: 600px 600px;
+}
+
+.page-cracks {
+    opacity: 0.55;
+    mix-blend-mode: multiply;
+}
+.page-cracks svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Burnt frame: a darker irregular band along the page edges,
+   roughed up via SVG displacement filter */
+.burnt-frame {
+    z-index: 1;
+    overflow: hidden;
+}
+.burnt-frame::before,
+.burnt-frame::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+.burnt-frame::before {
+    /* dark inset glow concentrated at edges */
+    box-shadow:
+        inset 0 0 30px 6px rgba(50,22,8,0.65),
+        inset 0 0 80px 18px rgba(70,32,10,0.42),
+        inset 0 0 160px 30px rgba(90,45,15,0.22);
+    filter: url(#roughEdge);
+    mix-blend-mode: multiply;
+    border-radius: 1px;
+}
+.burnt-frame::after {
+    /* even darker pinpoint burns near the corners */
+    background:
+        radial-gradient(ellipse 80px 60px at 0% 0%, rgba(40,18,5,0.7) 0%, transparent 70%),
+        radial-gradient(ellipse 80px 60px at 100% 0%, rgba(40,18,5,0.6) 0%, transparent 70%),
+        radial-gradient(ellipse 80px 60px at 0% 100%, rgba(40,18,5,0.65) 0%, transparent 70%),
+        radial-gradient(ellipse 90px 70px at 100% 100%, rgba(40,18,5,0.75) 0%, transparent 70%);
+    filter: url(#tornEdge);
+    mix-blend-mode: multiply;
+}
+
+/* Make sure all content above texture layers */
+.grimoire > *:not(.page-grain):not(.page-stains):not(.page-cracks):not(.burnt-frame):not(.candle-dust):not(.corner) {
+    position: relative;
+    z-index: 2;
+}
+
+/* ---------- Candle dust motes ---------- */
+.candle-dust {
+    z-index: 1;
+    overflow: hidden;
+    mix-blend-mode: screen;
+}
+.mote {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,225,170,0.9) 0%, rgba(255,200,130,0.5) 40%, transparent 70%);
+    box-shadow: 0 0 6px 1px rgba(255,210,150,0.4);
+    opacity: 0;
+    animation: drift var(--dur) ease-in-out var(--d) infinite;
+    will-change: transform, opacity;
+}
+
+@keyframes drift {
+    0%   { opacity: 0; transform: translate(0, 0) scale(0.7); }
+    15%  { opacity: 0.55; }
+    50%  { opacity: 0.85; transform: translate(20px, -40px) scale(1); }
+    85%  { opacity: 0.5; }
+    100% { opacity: 0; transform: translate(-10px, -90px) scale(0.75); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .mote { animation: none; opacity: 0.3; }
+}
+
+/* ---------- Corner flourishes ---------- */
+.corner {
+    position: absolute;
+    width: 88px;
+    height: 88px;
+    color: var(--gold);
+    opacity: 0.7;
+    pointer-events: none;
+    z-index: 3;
+    filter: drop-shadow(0 1px 0 rgba(255,235,180,0.4));
+}
+.corner-tl { top: 30px;    left: 30px; }
+.corner-tr { top: 30px;    right: 30px; transform: scaleX(-1); }
+.corner-bl { bottom: 30px; left: 30px;  transform: scaleY(-1); }
+.corner-br { bottom: 30px; right: 30px; transform: scale(-1, -1); }
+
+/* ---------- Background sigils ---------- */
+.sigil {
+    position: absolute;
+    width: 240px;
+    height: 240px;
+    color: var(--burgundy);
+    opacity: 0.07;
+    pointer-events: none;
+    z-index: 0;
+    filter: drop-shadow(0 1px 0 rgba(255,235,180,0.3));
+}
+.sigil-bench   { top: 80px;  right: 0;    color: var(--ink); opacity: 0.06; }
+.sigil-chart   { top: 0;     left: -40px; opacity: 0.05; }
+.sigil-results { bottom: 40px; right: -30px; opacity: 0.055; }
+
+@keyframes slowSpin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+.sigil { animation: slowSpin 240s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .sigil { animation: none; } }
+.sigil-bench, .sigil-chart, .sigil-results { transform-origin: center; }
+
+/* ---------- Section titles ---------- */
+.section-title {
+    font-family: 'Cinzel', 'Trajan Pro', serif;
+    font-weight: 600;
+    font-size: 1.55rem;
+    letter-spacing: 0.26em;
+    color: var(--ink);
+    text-transform: uppercase;
+    margin: 2.6rem 0 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+    text-shadow: 0 1px 0 rgba(255,240,200,0.55);
+}
+.section-title .section-title-text { flex: 0 0 auto; padding-right: 0.4rem; }
+.section-title::after {
+    content: '';
+    flex: 1 1 auto;
+    height: 1px;
+    background: linear-gradient(to right,
+        var(--rule) 0%,
+        var(--rule-faint) 60%,
+        transparent 100%);
+    align-self: center;
+    margin-top: 0.2em;
+}
+.section-title.centered { justify-content: center; }
+.section-title.centered::after,
+.section-title.centered::before { display: none; }
+.section-title.centered + .instruction,
+.section-title.centered + p { text-align: center; }
+
+/* In the two-column visualization grid, the panel titles share horizontal
+   space and would otherwise overflow into each other. Scale them down. */
+.visualization-grid .section-title {
+    font-size: 1.15rem;
+    letter-spacing: 0.16em;
+    margin-top: 2rem;
+    min-width: 0;
+}
+.visualization-grid .section-title .section-title-text {
+    flex: 0 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ---------- Dividers ---------- */
+.divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.4rem;
+    margin: 3.2rem auto 2.8rem;
+    max-width: 720px;
+}
+.divider .rule-line {
+    flex: 1 1 auto;
+    height: 1px;
+    background: linear-gradient(to right,
+        transparent 0%, var(--rule) 30%, var(--rule) 70%, transparent 100%);
+}
+.divider-glyph {
+    color: var(--gold);
+    font-size: 1rem;
+    letter-spacing: 0.45em;
+    padding: 0 0.4rem;
+    text-shadow: 0 1px 0 rgba(255,235,180,0.5);
+}
+
+.hero-rule {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin: 0 auto 1.5rem;
+    max-width: 320px;
+}
+.hero-rule .rule-line {
+    flex: 1 1 auto;
+    height: 1px;
+    background: linear-gradient(to right,
+        transparent 0%, var(--rule) 50%, transparent 100%);
+}
+.hero-rule .rule-fleuron {
+    color: var(--gold);
+    font-size: 0.95rem;
+}
+
+/* ---------- Hero ---------- */
+.hero {
+    text-align: center;
+    padding: 0.5rem 1rem 2.5rem;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 0.6rem;
+    position: relative;
+}
+.hero::after {
+    content: '';
+    position: absolute;
+    left: 18%;
+    right: 18%;
+    bottom: -3px;
+    height: 1px;
+    background: linear-gradient(to right,
+        transparent 0%, var(--gold-soft) 50%, transparent 100%);
+}
+
+.folio {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 1.02rem;
+    color: var(--ink-faint);
+    letter-spacing: 0.08em;
+    margin: 0 0 0.5rem;
+}
+.bottom-folio { margin-top: 0.4rem; }
+
+.title {
+    font-family: 'Cinzel', serif;
+    font-weight: 600;
+    font-size: clamp(2.6rem, 6vw, 4.4rem);
+    letter-spacing: 0.16em;
+    color: var(--burgundy-dark);
+    margin: 0.4rem 0 0.3rem;
+    line-height: 1.05;
+    text-shadow:
+        0 1px 0 rgba(255,240,200,0.55),
+        0 2px 1px rgba(80,30,10,0.1),
+        0 0 18px rgba(255,210,140,0.25);
+    animation: candleFlicker 6.4s ease-in-out infinite;
+}
+
+@keyframes candleFlicker {
+    0%, 100% { text-shadow:
+        0 1px 0 rgba(255,240,200,0.55),
+        0 2px 1px rgba(80,30,10,0.1),
+        0 0 18px rgba(255,210,140,0.25); }
+    47% { text-shadow:
+        0 1px 0 rgba(255,240,200,0.55),
+        0 2px 1px rgba(80,30,10,0.1),
+        0 0 12px rgba(255,200,130,0.18); }
+    52% { text-shadow:
+        0 1px 0 rgba(255,240,200,0.55),
+        0 2px 1px rgba(80,30,10,0.1),
+        0 0 22px rgba(255,215,150,0.32); }
+}
+@media (prefers-reduced-motion: reduce) { .title { animation: none; } }
+
+.subtitle {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 1.35rem;
+    color: var(--ink-soft);
+    margin: 0.4rem 0 1.2rem;
+    letter-spacing: 0.05em;
+}
+
+.ornament {
+    color: var(--gold);
+    font-size: 1.05rem;
+    letter-spacing: 0.45em;
+    margin: 1rem 0 1.4rem;
+    text-shadow: 0 1px 0 rgba(255,235,180,0.6);
+}
+
+.hook {
+    font-family: 'Pinyon Script', 'Italianno', cursive;
+    font-size: clamp(1.9rem, 3.4vw, 2.9rem);
+    font-weight: 400;
+    color: var(--burgundy);
+    line-height: 1.25;
+    margin: 1.3rem auto 1.6rem;
+    max-width: 720px;
+    letter-spacing: 0.01em;
+    text-shadow: 0 1px 0 rgba(255,235,200,0.5);
+}
+
+/* ---------- Workbench ---------- */
+.workbench {
+    margin: 2rem 0 1rem;
+    position: relative;
+}
+
+.step { margin: 2rem 0 2rem; }
+
+.step-title {
+    font-family: 'Cinzel', serif;
+    font-weight: 500;
+    font-size: 1.15rem;
+    letter-spacing: 0.18em;
+    color: var(--ink);
+    margin: 0 0 0.5rem;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    text-shadow: 0 1px 0 rgba(255,240,200,0.5);
+}
+
+/* Wax-seal numeral */
+.numeral {
+    display: inline-flex;
+    width: 2.5rem;
+    height: 2.5rem;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--parchment-light);
+    background:
+        radial-gradient(circle at 30% 26%, #a02f1c 0%, var(--burgundy) 35%, var(--burgundy-dark) 75%, var(--burgundy-deep) 100%);
+    border: 1px solid rgba(255,210,170,0.2);
+    box-shadow:
+        inset -2px -3px 6px rgba(0,0,0,0.55),
+        inset 2px 3px 4px rgba(255,200,150,0.24),
+        0 1px 2px rgba(0,0,0,0.5),
+        0 0 0 2px rgba(140,60,30,0.2),
+        0 0 14px rgba(160,60,30,0.18);
+    text-shadow: 0 -1px 0 rgba(0,0,0,0.55);
+    position: relative;
+}
+.numeral::after {
+    /* faint impression ring */
+    content: '';
+    position: absolute;
+    inset: 2px;
+    border-radius: 50%;
+    border: 1px dashed rgba(255,200,170,0.18);
+    pointer-events: none;
+}
+
+.instruction {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    color: var(--ink-soft);
+    margin: 0.2rem 0 1rem;
+    font-size: 1.06rem;
+    line-height: 1.55;
+    max-width: 780px;
+}
+
+/* ---------- Spirit picker — engraved brass tiles ---------- */
+.spirit-picker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+    margin: 1rem 0 1rem;
+}
+
+.spirit-btn {
+    font-family: 'Cinzel', serif;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    color: var(--ink);
+
+    background:
+        linear-gradient(180deg,
+            rgba(255,245,210,0.62) 0%,
+            rgba(220,190,130,0.55) 100%),
+        var(--parchment-warm);
+
+    border: 1px solid var(--gold);
+    box-shadow:
+        inset 0 1px 0 rgba(255,250,225,0.78),
+        inset 0 -1px 0 rgba(120,75,25,0.28),
+        inset 0 0 0 1px rgba(255,235,190,0.42),
+        0 1px 0 rgba(255,245,215,0.5),
+        0 2px 4px rgba(60,30,10,0.22);
+
+    padding: 0.95rem 1.5rem 0.85rem;
+    cursor: pointer;
+    border-radius: 1px;
+    transition: transform 0.18s ease, box-shadow 0.25s ease, background 0.25s ease, color 0.25s ease;
+    min-width: 142px;
+    text-align: center;
+    text-shadow: 0 1px 0 rgba(255,250,220,0.65);
+    position: relative;
+    overflow: hidden;
+}
+
+.spirit-btn::before {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border: 1px solid rgba(140,100,55,0.4);
+    border-radius: 1px;
+    pointer-events: none;
+}
+
+/* Light sweep on hover */
+.spirit-btn::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    left: -60%;
+    width: 40%;
+    background: linear-gradient(100deg,
+        transparent 0%,
+        rgba(255,235,180,0.35) 50%,
+        transparent 100%);
+    transform: skewX(-20deg);
+    pointer-events: none;
+    transition: left 0.6s ease;
+}
+.spirit-btn:hover::after { left: 120%; }
+
+.spirit-btn .spirit-count {
+    display: block;
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    color: var(--ink-faint);
+    margin-top: 0.3rem;
+    text-transform: none;
+}
+
+.spirit-btn:hover {
+    background:
+        linear-gradient(180deg,
+            rgba(255,245,210,0.78) 0%,
+            rgba(230,200,140,0.7) 100%),
+        var(--parchment-warm);
+    transform: translateY(-1px);
+    box-shadow:
+        inset 0 1px 0 rgba(255,250,225,0.85),
+        inset 0 -1px 0 rgba(120,75,25,0.3),
+        inset 0 0 0 1px rgba(255,235,190,0.55),
+        0 3px 7px rgba(60,30,10,0.32),
+        0 0 18px rgba(220,160,80,0.25);
+}
+
+.spirit-btn.active {
+    color: var(--gold-pale);
+    background:
+        linear-gradient(180deg, var(--burgundy-bright) 0%, var(--burgundy-dark) 100%);
+    border-color: var(--burgundy-deep);
+    text-shadow: 0 -1px 0 rgba(0,0,0,0.5), 0 1px 0 rgba(180,80,40,0.22);
+    box-shadow:
+        inset 0 1px 0 rgba(255,190,150,0.30),
+        inset 0 -1px 0 rgba(0,0,0,0.42),
+        inset 0 0 0 1px rgba(255,200,160,0.18),
+        0 2px 6px rgba(60,15,5,0.5),
+        0 0 22px rgba(160,60,30,0.30);
+}
+.spirit-btn.active::before { border-color: rgba(255,210,170,0.32); }
+.spirit-btn.active .spirit-count {
+    color: rgba(255,225,180,0.78);
+    font-style: italic;
+}
+
+/* ---------- Tags ---------- */
+.selection-row { margin: 0.5rem 0 1rem; }
+
+.tags-container {
+    display: flex;
+    align-items: baseline;
+    gap: 0.7rem;
+    flex-wrap: wrap;
+}
+
+.tags-label {
+    font-family: 'Cinzel', serif;
+    font-weight: 500;
+    font-size: 0.78rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+}
+
+.tags {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.tag {
+    display: inline-flex;
+    align-items: center;
+    background: linear-gradient(180deg, var(--burgundy-bright) 0%, var(--burgundy-dark) 100%);
+    color: var(--parchment-light);
+    padding: 0.32rem 0.45rem 0.32rem 0.85rem;
+    font-family: 'EB Garamond', serif;
+    font-size: 1rem;
+    border-radius: 1px;
+    border: 1px solid var(--burgundy-deep);
+    box-shadow:
+        inset 0 1px 0 rgba(255,200,160,0.25),
+        inset 0 -1px 0 rgba(0,0,0,0.3),
+        0 1px 3px rgba(50,10,5,0.4);
+    letter-spacing: 0.02em;
+    text-shadow: 0 -1px 0 rgba(0,0,0,0.4);
+    animation: inkSpread 0.45s ease-out both;
+}
+
+@keyframes inkSpread {
+    0%   { opacity: 0; transform: scale(0.85); filter: blur(2px); box-shadow: 0 0 0 0 rgba(180,60,30,0.6); }
+    60%  { opacity: 1; transform: scale(1.04); filter: blur(0); box-shadow: 0 0 0 6px rgba(180,60,30,0.15); }
+    100% { opacity: 1; transform: scale(1); filter: blur(0); box-shadow:
+        inset 0 1px 0 rgba(255,200,160,0.25),
+        inset 0 -1px 0 rgba(0,0,0,0.3),
+        0 1px 3px rgba(50,10,5,0.4); }
+}
+
+.tag .x {
+    margin-left: 0.55rem;
+    padding: 0 0.3rem;
+    cursor: pointer;
+    font-weight: 600;
+    line-height: 1;
+    color: rgba(255,225,180,0.7);
+    transition: color 0.15s ease;
+    user-select: none;
+}
+.tag .x:hover { color: var(--gold-pale); }
+
+.tag.spirit-tag {
+    background: linear-gradient(180deg, #2c1c10 0%, #150b04 100%);
+    border-color: #0a0502;
+    color: var(--gold-pale);
+}
+.tag.spirit-tag .x { color: rgba(220,180,120,0.65); }
+
+.tags-empty {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    color: var(--ink-faint);
+    font-size: 0.98rem;
+}
+
+/* ---------- Ingredient picker ---------- */
+.ingredient-picker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin: 0.8rem 0 0.4rem;
+    padding: 1.1rem 1.2rem;
+    background:
+        linear-gradient(180deg,
+            rgba(255,245,205,0.32) 0%,
+            rgba(210,170,110,0.18) 100%);
+    border-top: 1px solid var(--rule-faint);
+    border-bottom: 1px solid var(--rule-faint);
+    border-left: 1px dashed rgba(140,100,55,0.45);
+    border-right: 1px dashed rgba(140,100,55,0.45);
+    border-radius: 1px;
+    max-height: 380px;
+    overflow-y: auto;
+    box-shadow:
+        inset 0 1px 0 rgba(255,250,220,0.5),
+        inset 0 -1px 0 rgba(0,0,0,0.05);
+    position: relative;
+}
+
+.ingredient-picker::-webkit-scrollbar { width: 8px; }
+.ingredient-picker::-webkit-scrollbar-thumb {
+    background: var(--gold-soft);
+    border-radius: 4px;
+}
+.ingredient-picker::-webkit-scrollbar-track { background: transparent; }
+
+.ing-btn {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid rgba(140,100,55,0.4);
+    font-family: 'EB Garamond', serif;
+    font-size: 1rem;
+    padding: 0.32rem 0.75rem;
+    cursor: pointer;
+    border-radius: 1px;
+    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease,
+                opacity 0.6s ease, transform 0.18s ease, text-decoration-color 0.6s ease;
+    text-align: left;
+    letter-spacing: 0.01em;
+    /* Subtle ink-rise reveal */
+    animation: inkRise 0.5s ease-out both;
+    animation-delay: calc(var(--i, 0) * 8ms);
+}
+
+@keyframes inkRise {
+    0%   { opacity: 0; transform: translateY(3px); filter: blur(1.5px); }
+    60%  { opacity: 0.8; filter: blur(0); }
+    100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+.ing-btn:hover:not(.disabled) {
+    background-color: rgba(140,100,40,0.16);
+    border-color: var(--gold);
+    color: var(--burgundy-dark);
+    box-shadow: 0 0 12px rgba(220,160,80,0.25);
+}
+
+.ing-btn .ing-count {
+    color: var(--ink-faint);
+    font-size: 0.8rem;
+    margin-left: 0.45rem;
+    font-style: italic;
+    font-family: 'IM Fell English', serif;
+}
+
+.ing-btn.disabled {
+    color: var(--disabled);
+    border-color: transparent;
+    cursor: not-allowed;
+    background: transparent;
+    text-decoration: line-through;
+    text-decoration-color: rgba(120,80,40,0.5);
+    text-decoration-thickness: 1px;
+    opacity: 0.5;
+    font-style: italic;
+}
+.ing-btn.disabled .ing-count { color: var(--disabled); }
+
+.picker-hint {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--ink-faint);
+    margin: 0.6rem 0 0;
+}
+
+/* ---------- Status bar — engraved brass ribbon ---------- */
+.status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+
+    background:
+        linear-gradient(180deg,
+            rgba(255,245,205,0.7) 0%,
+            rgba(225,195,135,0.7) 100%);
+    border-top: 1px solid var(--gold);
+    border-bottom: 1px solid var(--gold);
+    padding: 1.1rem 1.4rem;
+    margin: 1.8rem 0 1rem;
+    position: relative;
+    box-shadow:
+        inset 0 1px 0 rgba(255,250,220,0.6),
+        inset 0 -1px 0 rgba(0,0,0,0.06);
+}
+.status-bar::before, .status-bar::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    height: 1px;
+    background: var(--gold-soft);
+    opacity: 0.55;
+}
+.status-bar::before { top: 3px; }
+.status-bar::after  { bottom: 3px; }
+
+.match-count {
+    margin: 0;
+    font-family: 'EB Garamond', serif;
+    font-size: 1.15rem;
+    color: var(--ink-soft);
+    font-style: italic;
+}
+
+.count-number {
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: 2rem;
+    color: var(--burgundy-dark);
+    margin-right: 0.45rem;
+    letter-spacing: 0.02em;
+    font-style: normal;
+    text-shadow: 0 1px 0 rgba(255,240,200,0.6);
+    transition: color 0.4s ease;
+}
+.count-number.zero { color: var(--ink-faint); }
+
+.reset-btn {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    background: transparent;
+    border: 1px solid var(--ink-soft);
+    color: var(--ink-soft);
+    padding: 0.55rem 1.1rem;
+    cursor: pointer;
+    border-radius: 1px;
+    transition: all 0.2s ease;
+    font-size: 0.98rem;
+    letter-spacing: 0.02em;
+}
+.reset-btn:hover {
+    background: var(--ink);
+    color: var(--parchment-light);
+    border-color: var(--ink);
+    box-shadow: 0 0 18px rgba(140,90,50,0.4);
+}
+
+/* ---------- Visualization grid ---------- */
+.visualization-grid {
+    display: grid;
+    grid-template-columns: 5fr 4fr;
+    gap: 3rem;
+    margin: 1rem 0 1rem;
+}
+@media (max-width: 900px) {
+    .visualization-grid { grid-template-columns: 1fr; gap: 2rem; }
+}
+
+.chart-panel, .results-panel { min-width: 0; position: relative; }
+
+.chart-wrap { padding: 0.6rem 0; }
+
+#chart {
+    width: 100%;
+    height: auto;
+    display: block;
+    font-family: 'EB Garamond', serif;
+}
+
+.chart-empty {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    color: var(--ink-faint);
+    padding: 2rem;
+    text-align: center;
+    border: 1px dashed var(--rule);
+    border-radius: 1px;
+}
+
+/* Chart bars */
+.bar-row { cursor: pointer; }
+.bar-row .bar {
+    fill: var(--burgundy);
+    transition: fill 0.2s ease;
+}
+.bar-row .bar-bg {
+    fill: rgba(140,100,55,0.10);
+    stroke: rgba(140,100,55,0.22);
+    stroke-width: 0.5;
+}
+.bar-row:hover .bar { fill: var(--burgundy-bright); }
+.bar-row:hover .bar-label {
+    fill: var(--burgundy-dark);
+    font-weight: 600;
+}
+.bar-label {
+    fill: var(--ink);
+    font-family: 'EB Garamond', serif;
+    font-size: 14px;
+    text-anchor: end;
+    dominant-baseline: middle;
+    transition: fill 0.2s ease;
+}
+.bar-value {
+    fill: var(--ink-faint);
+    font-family: 'IM Fell English', serif;
+    font-size: 13px;
+    font-style: italic;
+    dominant-baseline: middle;
+}
+
+/* ---------- Results — vintage recipe cards ---------- */
+.results {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    max-height: 740px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+.results::-webkit-scrollbar { width: 8px; }
+.results::-webkit-scrollbar-thumb {
+    background: var(--gold-soft);
+    border-radius: 4px;
+}
+.results::-webkit-scrollbar-track { background: transparent; }
+
+.cocktail-card {
+    background:
+        linear-gradient(180deg,
+            rgba(255,250,225,0.5) 0%,
+            rgba(240,220,170,0.36) 100%);
+    border: 1px solid var(--gold-soft);
+    padding: 1.2rem 1.4rem 1.3rem;
+    position: relative;
+    box-shadow:
+        inset 0 1px 0 rgba(255,250,220,0.55),
+        inset 0 0 0 1px rgba(255,235,190,0.22),
+        0 1px 3px rgba(60,30,10,0.14),
+        0 4px 12px rgba(60,30,10,0.08);
+
+    /* magical reveal */
+    animation: cardReveal 0.55s ease-out both;
+    animation-delay: calc(var(--i, 0) * 50ms);
+}
+
+@keyframes cardReveal {
+    0%   { opacity: 0; transform: translateY(8px); filter: blur(3px) sepia(0.4); }
+    70%  { opacity: 1; filter: blur(0) sepia(0.05); }
+    100% { opacity: 1; transform: translateY(0); filter: blur(0) sepia(0); }
+}
+
+/* Inner hairline double-rule */
+.cocktail-card::before {
+    content: '';
+    position: absolute;
+    inset: 6px;
+    border: 1px solid rgba(140,100,55,0.34);
+    pointer-events: none;
+}
+
+.cocktail-card .name {
+    font-family: 'Cinzel', serif;
+    font-weight: 600;
+    font-size: 1.2rem;
+    color: var(--burgundy-dark);
+    margin: 0 0 0.1rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-shadow: 0 1px 0 rgba(255,240,200,0.55);
+}
+
+.cocktail-card .category {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 0.86rem;
+    color: var(--ink-faint);
+    margin: 0 0 0.85rem;
+    letter-spacing: 0.05em;
+    padding-bottom: 0.55rem;
+    border-bottom: 1px solid var(--rule-faint);
+    position: relative;
+}
+.cocktail-card .category::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    bottom: -3px;
+    height: 1px;
+    background: var(--rule-faint);
+    opacity: 0.5;
+}
+
+.cocktail-card ul.ingredients { margin: 0; padding: 0; list-style: none; }
+
+.cocktail-card ul.ingredients li {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    padding: 0.28rem 0;
+    font-family: 'EB Garamond', serif;
+    font-size: 1.02rem;
+}
+.cocktail-card ul.ingredients li + li {
+    border-top: 1px dotted rgba(140,100,55,0.32);
+}
+
+.cocktail-card .ing-name { color: var(--ink); flex: 0 0 auto; order: 1; }
+.cocktail-card .ing-name.matched {
+    color: var(--burgundy);
+    font-weight: 600;
+    font-style: italic;
+}
+.cocktail-card .ing-name.matched::before {
+    content: '✦ ';
+    color: var(--gold);
+    font-size: 0.75em;
+}
+
+.cocktail-card ul.ingredients li::before {
+    content: '';
+    flex: 1 1 auto;
+    order: 2;
+    border-bottom: 1px dotted rgba(140,100,55,0.45);
+    margin: 0 0.3rem;
+    transform: translateY(-3px);
+}
+
+.cocktail-card .measure {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    color: var(--ink-faint);
+    text-align: right;
+    white-space: nowrap;
+    flex: 0 0 auto;
+    font-size: 0.98rem;
+    order: 3;
+}
+
+.results-empty {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    color: var(--ink-faint);
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    border: 1px dashed var(--rule);
+    border-radius: 1px;
+    font-size: 1.05rem;
+    background: rgba(255,245,205,0.15);
+}
+
+.results-overflow-note {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    color: var(--ink-faint);
+    font-size: 0.92rem;
+    text-align: center;
+    padding: 0.7rem;
+    letter-spacing: 0.02em;
+}
+
+/* ---------- ABT ---------- */
+.abt { margin: 1rem 0 2rem; padding: 1.5rem 0 0; }
+
+.abt-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2.5rem;
+    margin-top: 1.5rem;
+}
+@media (max-width: 800px) {
+    .abt-grid { grid-template-columns: 1fr; gap: 1.6rem; }
+}
+
+.abt-card { text-align: center; padding: 0.5rem 0.5rem; position: relative; }
+.abt-card + .abt-card::before {
+    content: '';
+    position: absolute;
+    left: -1.3rem;
+    top: 18%;
+    bottom: 18%;
+    width: 1px;
+    background: linear-gradient(to bottom,
+        transparent 0%, var(--rule) 40%, var(--rule) 60%, transparent 100%);
+}
+@media (max-width: 800px) {
+    .abt-card + .abt-card::before { display: none; }
+}
+
+.abt-mark {
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.32em;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+    text-shadow: 0 1px 0 rgba(255,235,180,0.55);
+}
+
+.abt-card h3 {
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--burgundy-dark);
+    letter-spacing: 0.3em;
+    margin: 0 0 0.8rem;
+    text-transform: uppercase;
+    text-shadow: 0 1px 0 rgba(255,240,200,0.55);
+    position: relative;
+    display: inline-block;
+    padding-bottom: 0.5rem;
+}
+.abt-card h3::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 0;
+    width: 40px;
+    height: 1px;
+    background: var(--gold);
+}
+
+.abt-card p {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 1.06rem;
+    line-height: 1.55;
+    color: var(--ink);
+    margin: 0;
+}
+
+/* ---------- Teaches ---------- */
+.teaches { margin: 2rem 0 1rem; padding: 0 1rem; }
+.teaches p {
+    font-family: 'EB Garamond', serif;
+    font-size: 1.12rem;
+    line-height: 1.78;
+    color: var(--ink);
+    max-width: 760px;
+    margin: 1rem auto 0;
+    text-align: justify;
+    text-wrap: pretty;
+    hyphens: auto;
+}
+.teaches em { color: var(--burgundy); font-style: italic; }
+
+.teaches p::first-letter {
+    font-family: 'Cinzel', serif;
+    font-size: 4.4rem;
+    line-height: 0.85;
+    float: left;
+    margin: 0.4rem 0.6rem 0 0;
+    color: var(--burgundy-dark);
+    font-weight: 700;
+    text-shadow:
+        0 1px 0 rgba(255,240,200,0.6),
+        1px 2px 2px rgba(60,20,5,0.12);
+    padding: 0 0.1rem;
+}
+
+/* ---------- Colophon ---------- */
+.colophon {
+    margin: 3rem 0 0;
+    padding: 1.8rem 0 0;
+    border-top: 1px solid var(--rule);
+    text-align: center;
+    font-family: 'IM Fell English', serif;
+    font-size: 0.95rem;
+    color: var(--ink-faint);
+    line-height: 1.65;
+    position: relative;
+}
+.colophon::before {
+    content: '';
+    position: absolute;
+    left: 30%;
+    right: 30%;
+    top: 3px;
+    height: 1px;
+    background: linear-gradient(to right,
+        transparent 0%, var(--gold-soft) 50%, transparent 100%);
+}
+.colophon-mark {
+    color: var(--gold);
+    font-size: 1.4rem;
+    letter-spacing: 0.4em;
+    margin-bottom: 0.7rem;
+    text-shadow: 0 1px 0 rgba(255,235,180,0.55);
+}
+.colophon p { margin: 0 auto; max-width: 720px; }
+.colophon em { font-style: italic; color: var(--ink-soft); }
+.colophon a {
+    color: var(--burgundy);
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+}
+.colophon a:hover { color: var(--burgundy-dark); }
+
+/* ---------- Reset "close the book" pulse ---------- */
+.grimoire.resetting {
+    animation: closeBook 0.6s ease-out;
+}
+@keyframes closeBook {
+    0%   { transform: scale(1); filter: brightness(1); }
+    40%  { transform: scale(0.985); filter: brightness(0.82) blur(0.4px); }
+    100% { transform: scale(1); filter: brightness(1) blur(0); }
+}
+
+/* ---------- Loading ---------- */
+.loading {
+    text-align: center;
+    padding: 4rem 1rem;
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    color: var(--ink-faint);
+}
+
+/* ---------- Small-screen polish ---------- */
+@media (max-width: 640px) {
+    body { padding: 1.5rem 0.5rem 2rem; }
+    .grimoire {
+        padding: 3.5rem 1.2rem 2.5rem;
+        box-shadow:
+            inset 0 0 80px rgba(80,40,15,0.32),
+            inset 0 0 0 1px rgba(140,100,55,0.55),
+            inset 0 0 0 4px var(--parchment-warm),
+            inset 0 0 0 5px var(--gold),
+            0 0 0 2px var(--gold),
+            0 0 0 6px var(--leather),
+            0 30px 50px rgba(0,0,0,0.65);
+    }
+    .corner { width: 50px; height: 50px; }
+    .corner-tl, .corner-tr { top: 16px; }
+    .corner-tl, .corner-bl { left: 16px; }
+    .corner-tr, .corner-br { right: 16px; }
+    .corner-bl, .corner-br { bottom: 16px; }
+    .sigil { width: 160px; height: 160px; }
+    .section-title { font-size: 1.25rem; letter-spacing: 0.2em; }
+    .spirit-btn { min-width: 0; flex: 1 1 calc(50% - 0.5rem); }
+}
