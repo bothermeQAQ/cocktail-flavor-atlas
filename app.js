@@ -15,11 +15,11 @@
     const SPIRIT_CATEGORIES = {
         gin:     { label: 'Gin',     patterns: [/\bgin\b/i] },
         vodka:   { label: 'Vodka',   patterns: [/\bvodka\b/i] },
-        rum:     { label: 'Rum',     patterns: [/\brum\b/i] },
+        rum:     { label: 'Rum',     patterns: [/\brum\b/i, /\brhum\b/i, /\bcacha[cç]a\b/i] },
         tequila: { label: 'Tequila', patterns: [/\btequila\b/i] },
         whiskey: { label: 'Whiskey', patterns: [/\bwhiske?y\b/i, /\bbourbon\b/i, /\brye\b/i, /\bscotch\b/i] },
-        brandy:  { label: 'Brandy',  patterns: [/\bbrandy\b/i, /\bcognac\b/i] },
-        mezcal:  { label: 'Mezcal',  patterns: [/\bmezcal\b/i] }
+        brandy:  { label: 'Brandy',  patterns: [/\bbrandy\b/i, /\bcognac\b/i, /\bapplejack\b/i, /\bcalvados\b/i, /\bpisco\b/i, /\barmagnac\b/i] },
+        others:  { label: 'Liqueurs & Wine',  patterns: [] }
     };
 
     const RESULTS_SHOW_LIMIT = 30;
@@ -28,7 +28,7 @@
     /* ------------------------- State ------------------------- */
 
     const state = {
-        cocktails: [],            // [{name, category, ingredients:[{name,displayName,measure}], spirits:Set}]
+        cocktails: [],            // [{name, category, ingredients:[{name,displayName,measure}], spirit:string}]
         displayNames: new Map(),  // lowercased -> first-seen original casing
         baseSpirit: null,         // key in SPIRIT_CATEGORIES
         selected: [],             // ingredient names (lowercased), order of addition
@@ -66,20 +66,50 @@
             .filter(c => c.ingredients.length > 0);
 
         for (const c of state.cocktails) {
-            c.spirits = detectSpirits(c.ingredients);
+            c.spirit = detectPrimarySpirit(c.ingredients);
         }
     }
 
-    function detectSpirits(ingredients) {
-        const found = new Set();
-        for (const ing of ingredients) {
+    // Returns the single primary spirit key by summing oz for each matched
+    // spirit across all ingredients. Ties are broken by first appearance in
+    // recipe order. Falls back to first-listed when no oz are parseable.
+    function detectPrimarySpirit(ingredients) {
+        const volumes  = {};  // spirit key -> total oz
+        const firstSeen = {}; // spirit key -> ingredient index of first match
+
+        for (let i = 0; i < ingredients.length; i++) {
+            const ing = ingredients[i];
             for (const [key, def] of Object.entries(SPIRIT_CATEGORIES)) {
+                if (key === 'others') continue;
                 if (def.patterns.some(p => p.test(ing.name))) {
-                    found.add(key);
+                    volumes[key]  = (volumes[key] || 0) + parseMeasureOz(ing.measure);
+                    if (!(key in firstSeen)) firstSeen[key] = i;
+                    break;
                 }
             }
         }
-        return found;
+
+        const keys = Object.keys(volumes);
+        if (keys.length === 0) return 'others';
+
+        const maxVol = Math.max(...keys.map(k => volumes[k]));
+        return keys
+            .filter(k => volumes[k] === maxVol)
+            .sort((a, b) => firstSeen[a] - firstSeen[b])[0];
+    }
+
+    function parseMeasureOz(measure) {
+        if (!measure) return 0;
+        const s = measure.toLowerCase();
+        if (!s.includes('oz')) return 0;
+        const num = s.replace(/oz.*$/, '').trim();
+        const mixed = num.match(/^(\d+)\s+(\d+)\/(\d+)$/);
+        if (mixed) return +mixed[1] + +mixed[2] / +mixed[3];
+        const frac = num.match(/^(\d+)\/(\d+)$/);
+        if (frac) return +frac[1] / +frac[2];
+        const whole = num.match(/^(\d+(?:\.\d+)?)$/);
+        if (whole) return +whole[1];
+        return 0;
     }
 
     /* ------------------- Filtering / availability ------------- */
@@ -87,7 +117,7 @@
     function applyFilters() {
         let pool = state.cocktails;
         if (state.baseSpirit) {
-            pool = pool.filter(c => c.spirits.has(state.baseSpirit));
+            pool = pool.filter(c => c.spirit === state.baseSpirit);
         }
         for (const ing of state.selected) {
             pool = pool.filter(c => c.ingredients.some(i => i.name === ing));
@@ -100,7 +130,7 @@
     // further — instead, individual items flip to a disabled state.
     function buildIngredientUniverse() {
         if (!state.baseSpirit) return [];
-        const spiritPool = state.cocktails.filter(c => c.spirits.has(state.baseSpirit));
+        const spiritPool = state.cocktails.filter(c => c.spirit === state.baseSpirit);
         const counts = new Map();
         for (const c of spiritPool) {
             for (const i of c.ingredients) {
@@ -142,7 +172,7 @@
 
         const counts = new Map();
         for (const c of state.cocktails) {
-            for (const s of c.spirits) counts.set(s, (counts.get(s) || 0) + 1);
+            counts.set(c.spirit, (counts.get(c.spirit) || 0) + 1);
         }
 
         for (const [key, def] of Object.entries(SPIRIT_CATEGORIES)) {
