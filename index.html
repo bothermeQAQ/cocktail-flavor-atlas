@@ -158,8 +158,25 @@
                             <div class="tags" id="tags"></div>
                         </div>
                     </div>
-                    <div class="ingredient-picker" id="ingredient-picker"></div>
-                    <p class="picker-hint" id="picker-hint"></p>
+                    <div class="step2-grid">
+                        <div class="step2-ingredients">
+                            <div class="ingredient-search-wrap">
+                                <input type="text" id="ingredient-search" class="ingredient-search"
+                                       placeholder="Search ingredients…" autocomplete="off" spellcheck="false"
+                                       aria-label="Search ingredients">
+                            </div>
+                            <div class="ingredient-picker" id="ingredient-picker"></div>
+                            <p class="picker-hint" id="picker-hint"></p>
+                        </div>
+                        <div class="step2-chart chart-panel">
+                            <svg class="sigil sigil-chart" aria-hidden="true"><use href="#sigil-fire"/></svg>
+                            <h2 class="section-title"><span class="section-title-text">The Ingredient Constellation</span></h2>
+                            <p class="instruction" id="chart-hint">The companions most often mixed with your current selection. Click a bar to add it.</p>
+                            <div class="chart-wrap">
+                                <svg id="chart" role="img" aria-label="Bar chart of ingredient frequencies"></svg>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="status-bar" id="status-bar" hidden>
@@ -180,15 +197,6 @@
             </div>
 
             <section class="visualization-grid" id="visualization-grid" hidden>
-                <div class="chart-panel">
-                    <svg class="sigil sigil-chart" aria-hidden="true"><use href="#sigil-fire"/></svg>
-                    <h2 class="section-title"><span class="section-title-text">The Ingredient Constellation</span></h2>
-                    <p class="instruction" id="chart-hint">The companions most often mixed with your current selection. Click a bar to add it.</p>
-                    <div class="chart-wrap">
-                        <svg id="chart" role="img" aria-label="Bar chart of ingredient frequencies"></svg>
-                    </div>
-                </div>
-
                 <div class="results-panel">
                     <svg class="sigil sigil-results" aria-hidden="true"><use href="#sigil-cup"/></svg>
                     <h2 class="section-title"><span class="section-title-text">Recipes Revealed</span></h2>

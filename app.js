@@ -22,6 +22,144 @@
         others:  { label: 'Liqueurs & Wine',  patterns: [] }
     };
 
+    // Maps raw ingredient names (lowercased) to a canonical lowercased form.
+    // Keeps the picker list short and deduplicated.
+    const INGREDIENT_ALIASES = new Map([
+        // === Rum family ===
+        ['light rum', 'rum'], ['dark rum', 'rum'], ['white rum', 'rum'],
+        ['gold rum', 'rum'], ['spiced rum', 'rum'], ['coconut rum', 'rum'],
+        ['coconut-flavored rum', 'rum'], ['african rum', 'rum'],
+        ['jamaica rum', 'rum'], ['bacardi rum', 'rum'], ['151-proof rum', 'rum'],
+        ['mr. boston rum', 'rum'], ['old mr. boston rum', 'rum'],
+        ['old mr. boston imported rum', 'rum'], ['light or dark rum', 'rum'],
+        ['17-year-old j. wray and nephew ltd. rum', 'rum'],
+        ['aged rhum agricole', 'rum'], ['cachaca', 'rum'],
+        ['cachaca (brazilian rum)', 'rum'], ['batavia arrack or light rum', 'rum'],
+        // === Gin family ===
+        ['dry gin', 'gin'], ['old tom gin', 'gin'], ['mint-flavored gin', 'gin'],
+        ['orange flavored gin', 'gin'], ['tanqueray gin', 'gin'],
+        ['mr. boston gin', 'gin'], ['old mr. boston dry gin', 'gin'],
+        ['old mr. boston orange flavored gin', 'gin'],
+        ['sloe gin', 'gin'], ['old mr. boston sloe gin', 'gin'],
+        // === Vodka family ===
+        ['100-proof vodka', 'vodka'], ['mr. boston vodka', 'vodka'],
+        ['old mr. boston vodka', 'vodka'], ['old mr. boston 100 proof vodka', 'vodka'],
+        ['acai berry flavored vodka', 'vodka'], ['bison grass vodka (zubrowka)', 'vodka'],
+        ['black cherry-flavored vodka', 'vodka'], ['cherry vodka', 'vodka'],
+        ['citrus-flavored vodka', 'vodka'], ['grapefruit-flavored vodka', 'vodka'],
+        ['lemon-flavored vodka', 'vodka'], ['lime vodka', 'vodka'],
+        ['mango-flavored vodka', 'vodka'], ['old mr. boston grape vodka', 'vodka'],
+        ['orange-flavored vodka', 'vodka'], ['peach-flavored vodka', 'vodka'],
+        ['pear-flavored vodka', 'vodka'], ['raspberry-flavored vodka', 'vodka'],
+        ['vanilla-flavored vodka', 'vodka'],
+        // === Tequila / Mezcal family ===
+        ['anejo tequila', 'tequila'], ['blanco tequila', 'tequila'],
+        ['gold tequila', 'tequila'], ['jalapeno-infused tequila', 'tequila'],
+        ['old mr. boston tequila', 'tequila'], ['reposado blanco tequila', 'tequila'],
+        ['reposado tequila', 'tequila'], ['mezcal', 'tequila'],
+        // === Whiskey family (including Scotch) ===
+        ['blended whiskey', 'whiskey'], ['bourbon', 'whiskey'],
+        ['bourbon or rye whiskey', 'whiskey'], ['bourbon whiskey', 'whiskey'],
+        ['canadian whisky', 'whiskey'], ['georgia moon corn whiskey', 'whiskey'],
+        ['irish whiskey', 'whiskey'], ['old mr. boston blended whiskey', 'whiskey'],
+        ['old kentucky tavern bourbon whiskey', 'whiskey'],
+        ['old thompson blended whiskey', 'whiskey'],
+        ['rye or bourbon whiskey', 'whiskey'], ['rye whiskey', 'whiskey'],
+        ['straight rye whiskey', 'whiskey'], ['straight rye whisky', 'whiskey'],
+        ['tennessee whiskey', 'whiskey'], ['vanilla-infused bourbon', 'whiskey'],
+        ['white whiskey', 'whiskey'], ['scotch', 'whiskey'],
+        ['blended scotch whiskey', 'whiskey'], ['desmond & duff scotch whisky', 'whiskey'],
+        ['scotch whiskey', 'whiskey'], ['single-malt scotch whisky', 'whiskey'],
+        ['smoky scotch', 'whiskey'], ['smoky scotch whisky', 'whiskey'],
+        // === Brandy family ===
+        ['apple brandy', 'brandy'], ['apple flavored brandy', 'brandy'],
+        ['applejack', 'brandy'], ['apricot flavored brandy', 'brandy'],
+        ['apricot-flavored brandy', 'brandy'], ['armagnac', 'brandy'],
+        ['blackberry-flavored brandy', 'brandy'], ['calvados', 'brandy'],
+        ['cherry-flavored brandy', 'brandy'], ['coffee-flavored brandy', 'brandy'],
+        ['cognac', 'brandy'], ['hennessy v.s cognac', 'brandy'],
+        ['mr. boston apricot flavored brandy', 'brandy'],
+        ['mr. boston five star brandy', 'brandy'],
+        ['old mr. boston apricot flavored brandy', 'brandy'],
+        ['old mr. boston five star brandy', 'brandy'],
+        ['old mr. boston wild cherry flavored brandy', 'brandy'],
+        ['peach-flavored brandy', 'brandy'], ['pear brandy', 'brandy'],
+        ['pisco', 'brandy'], ['vs cognac', 'brandy'],
+        // === Juices ===
+        ['fresh lemon juice', 'lemon juice'], ['juice of a lemon', 'lemon juice'],
+        ['fresh lime juice', 'lime juice'], ['juice of a lime', 'lime juice'],
+        ["rose's lime juice", 'lime juice'], ['roses lime juice', 'lime juice'],
+        ['fresh orange juice', 'orange juice'], ['juice of orange', 'orange juice'],
+        ['fresh grapefruit juice', 'grapefruit juice'],
+        ['fresh ruby red grapefruit juice', 'grapefruit juice'],
+        ['fresh white or ruby red grapefruit juice', 'grapefruit juice'],
+        // === Orange liqueur / Triple Sec ===
+        ['cointreau or triple sec', 'triple sec'], ['cointreau triple sec', 'triple sec'],
+        ['mr. boston triple sec', 'triple sec'], ['old mr. boston triple sec', 'triple sec'],
+        ['splash triple sec', 'triple sec'], ['white curacao or triple sec', 'triple sec'],
+        ['orange liqueur', 'triple sec'], ['orange curacao', 'triple sec'],
+        ['white curacao', 'triple sec'], ['curacao', 'triple sec'],
+        // === Crème de Cacao ===
+        ['creme de cacao (brown)', 'creme de cacao'], ['creme de cacao (white)', 'creme de cacao'],
+        ['dark creme de cacao', 'creme de cacao'], ['white creme de cacao', 'creme de cacao'],
+        ['white or dark creme de cacao', 'creme de cacao'],
+        ['old mr. boston creme de cacao', 'creme de cacao'],
+        ['old mr. boston white creme de cacao', 'creme de cacao'],
+        // === Crème de Menthe ===
+        ['creme de menthe (white)', 'creme de menthe'], ['green creme de menthe', 'creme de menthe'],
+        ['white creme de menthe', 'creme de menthe'],
+        ['old mr. boston creme de menthe (white)', 'creme de menthe'],
+        ['old mr. boston green creme de menthe', 'creme de menthe'],
+        ['old mr. boston white creme de menthe', 'creme de menthe'],
+        ['mr. boston creme de menthe', 'creme de menthe'],
+        // === Soda water ===
+        ['carbonated water', 'soda water'], ['club soda', 'soda water'],
+        // === Simple syrup ===
+        ['sugar syrup', 'simple syrup'], ['rock candy syrup or simple syrup', 'simple syrup'],
+        // === Bitters ===
+        ['bitters', 'angostura bitters'],
+        // === Port ===
+        ['ruby port', 'port'], ['tawny port', 'port'], ['white port wine', 'port'],
+        // === Sherry ===
+        ['amontillado sherry', 'sherry'], ['cream sherry', 'sherry'],
+        ['dry sherry', 'sherry'], ['manzanilla sherry', 'sherry'],
+        ['oloroso sherry', 'sherry'], ['palo cortado or oloroso sherry', 'sherry'],
+        ['pedro ximenez sherry', 'sherry'], ['sweet sherry', 'sherry'],
+        // === Champagne / Sparkling wine ===
+        ['chilled champagne', 'champagne'],
+        ['chilled sparkling wine or champagne', 'champagne'],
+        ['chilled sparkling wine', 'sparkling wine'],
+        // === Misc consolidations ===
+        ['amaretto di saronno', 'amaretto'],
+        ['light cream', 'cream'], ['heavy cream', 'cream'],
+        ['maraschino liqueur', 'maraschino'],
+        ['amaro nonino', 'amaro'], ['ramazzotti amaro', 'amaro'],
+        ['peach liqueur', 'peach schnapps'],
+        ['light vermouth', 'dry vermouth'],
+        ['black raspberry liqueur', 'raspberry liqueur'],
+        ['raspberry-flavored liqueur', 'raspberry liqueur'],
+        ['dubonnet rouge', 'dubonnet'],
+    ]);
+
+    // Preferred display names for canonical ingredient keys.
+    const CANONICAL_DISPLAY = {
+        'rum': 'Rum', 'gin': 'Gin', 'vodka': 'Vodka',
+        'tequila': 'Tequila', 'whiskey': 'Whiskey', 'brandy': 'Brandy',
+        'lemon juice': 'Lemon Juice', 'lime juice': 'Lime Juice',
+        'orange juice': 'Orange Juice', 'grapefruit juice': 'Grapefruit Juice',
+        'triple sec': 'Triple Sec',
+        'creme de cacao': 'Crème de Cacao', 'creme de menthe': 'Crème de Menthe',
+        'soda water': 'Soda Water', 'simple syrup': 'Simple Syrup',
+        'angostura bitters': 'Angostura Bitters',
+        'port': 'Port', 'sherry': 'Sherry',
+        'champagne': 'Champagne', 'sparkling wine': 'Sparkling Wine',
+        'amaretto': 'Amaretto', 'cream': 'Cream',
+        'maraschino': 'Maraschino', 'amaro': 'Amaro',
+        'peach schnapps': 'Peach Schnapps',
+        'dry vermouth': 'Dry Vermouth', 'sweet vermouth': 'Sweet Vermouth',
+        'raspberry liqueur': 'Raspberry Liqueur', 'dubonnet': 'Dubonnet',
+    };
+
     const RESULTS_SHOW_LIMIT = 30;
     const CHART_TOP_N = 14;
 
@@ -37,6 +175,25 @@
 
     /* ------------------------- Loading ----------------------- */
 
+    // Returns canonical ingredient key, or null to skip the entry entirely.
+    function normalizeIngredient(lower) {
+        // Skip "each X, Y, Z" multi-ingredient fields
+        if (/^each\b/.test(lower)) return null;
+
+        // Strip trailing embedded measures: ", 1/2 oz", " 1 oz", "1 oz" at end
+        let s = lower
+            .replace(/,?\s*\d[\d\s/]*\s*(oz|tsp|tbsp|dash(?:es)?|drop(?:s)?|cup(?:s)?|ml|cl)\b.*/i, '')
+            .trim();
+
+        // Strip orphaned trailing "and" left after measure removal ("vanilla liqueur and 3 oz" → "vanilla liqueur and")
+        s = s.replace(/\s+and\s*$/, '').trim();
+
+        // Skip remaining multi-ingredient fields (still contain a comma)
+        if (!s || s.includes(',')) return null;
+
+        return INGREDIENT_ALIASES.get(s) || s;
+    }
+
     async function loadData() {
         const rows = await d3.csv(DATA_URL);
 
@@ -44,9 +201,10 @@
         for (const row of rows) {
             const ingRaw = (row.ingredient || '').trim();
             if (!ingRaw) continue;
-            const lower = ingRaw.toLowerCase();
+            const lower = normalizeIngredient(ingRaw.toLowerCase());
+            if (!lower) continue;
             if (!state.displayNames.has(lower)) {
-                state.displayNames.set(lower, ingRaw);
+                state.displayNames.set(lower, CANONICAL_DISPLAY[lower] || ingRaw);
             }
             if (!groups.has(row.name)) {
                 groups.set(row.name, {
@@ -230,6 +388,12 @@
         }
     }
 
+    function isBaseSpirit(ingredientName) {
+        return Object.entries(SPIRIT_CATEGORIES)
+            .filter(([key]) => key !== 'others')
+            .some(([, def]) => def.patterns.some(p => p.test(ingredientName)));
+    }
+
     function renderIngredientPicker() {
         const root = document.getElementById('ingredient-picker');
         const hint = document.getElementById('picker-hint');
@@ -244,36 +408,54 @@
         const statusList = ingredientStatus(universe);
         const visible = statusList.filter(item => !item.alreadySelected);
 
-        // Clickable first, then by initial frequency in the spirit pool.
-        visible.sort((a, b) => {
+        const sortGroup = arr => arr.sort((a, b) => {
             if (a.clickable !== b.clickable) return a.clickable ? -1 : 1;
             return b.spiritCount - a.spiritCount
                 || a.displayName.localeCompare(b.displayName);
         });
 
+        const selectedPatterns = SPIRIT_CATEGORIES[state.baseSpirit]?.patterns || [];
+        const isSelectedSpirit = name => selectedPatterns.some(p => p.test(name));
+
+        const spirits = sortGroup(visible.filter(item =>
+            isBaseSpirit(item.name) && !isSelectedSpirit(item.name)));
+        const others  = sortGroup(visible.filter(item => !isBaseSpirit(item.name)));
+
         let clickableCount = 0;
         let idx = 0;
 
-        for (const item of visible) {
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'ing-btn' + (item.clickable ? '' : ' disabled');
-            btn.disabled = !item.clickable;
-            btn.style.setProperty('--i', Math.min(idx++, 40));
-            btn.innerHTML = `${escapeHTML(item.displayName)}<span class="ing-count">${item.wouldRemain}</span>`;
+        const appendGroup = (label, items) => {
+            if (items.length === 0) return;
 
-            if (item.clickable) {
-                clickableCount++;
-                btn.title = `Adds this ingredient — ${item.wouldRemain} matching cocktail${item.wouldRemain === 1 ? '' : 's'} would remain.`;
-                btn.addEventListener('click', () => {
-                    state.selected.push(item.name);
-                    update();
-                });
-            } else {
-                btn.title = 'No cocktail in your current selection contains this ingredient.';
+            const header = document.createElement('div');
+            header.className = 'ing-group-label';
+            header.textContent = label;
+            root.appendChild(header);
+
+            for (const item of items) {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'ing-btn' + (item.clickable ? '' : ' disabled');
+                btn.disabled = !item.clickable;
+                btn.style.setProperty('--i', Math.min(idx++, 40));
+                btn.innerHTML = `${escapeHTML(item.displayName)}<span class="ing-count">${item.wouldRemain}</span>`;
+
+                if (item.clickable) {
+                    clickableCount++;
+                    btn.title = `Adds this ingredient — ${item.wouldRemain} matching cocktail${item.wouldRemain === 1 ? '' : 's'} would remain.`;
+                    btn.addEventListener('click', () => {
+                        state.selected.push(item.name);
+                        update();
+                    });
+                } else {
+                    btn.title = 'No cocktail in your current selection contains this ingredient.';
+                }
+                root.appendChild(btn);
             }
-            root.appendChild(btn);
-        }
+        };
+
+        appendGroup('Base Spirits', spirits);
+        appendGroup('Modifiers & Accents', others);
 
         hint.textContent = `${clickableCount} of ${visible.length} ingredients can still join your current hand.`;
     }
@@ -474,6 +656,16 @@
             .text(d => `${d.displayName}: appears in ${d.count} of the ${state.matching.length} matching cocktails. Click to add.`);
     }
 
+    /* --------------------- Search filter --------------------- */
+
+    function applySearchFilter(term) {
+        const q = term.toLowerCase().trim();
+        document.querySelectorAll('#ingredient-picker .ing-btn').forEach(btn => {
+            btn.classList.toggle('search-hidden',
+                q.length > 0 && !btn.textContent.toLowerCase().includes(q));
+        });
+    }
+
     /* --------------------- Update orchestrator ---------------- */
 
     function update() {
@@ -484,6 +676,9 @@
         renderStatusBar();
         renderResults();
         renderChart();
+
+        const searchEl = document.getElementById('ingredient-search');
+        if (searchEl) searchEl.value = '';
 
         document.getElementById('step-2').hidden = !state.baseSpirit;
         document.getElementById('visualization-grid').hidden =
@@ -505,6 +700,10 @@
     /* -------------------------- Init -------------------------- */
 
     async function init() {
+        document.getElementById('ingredient-search').addEventListener('input', function () {
+            applySearchFilter(this.value);
+        });
+
         document.getElementById('reset-btn').addEventListener('click', () => {
             const book = document.querySelector('.grimoire');
             if (book) {
