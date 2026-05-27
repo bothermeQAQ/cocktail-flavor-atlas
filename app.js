@@ -71,6 +71,7 @@
         ['blended scotch whiskey', 'whiskey'], ['desmond & duff scotch whisky', 'whiskey'],
         ['scotch whiskey', 'whiskey'], ['single-malt scotch whisky', 'whiskey'],
         ['smoky scotch', 'whiskey'], ['smoky scotch whisky', 'whiskey'],
+        ['rock and rye', 'whiskey'], ['old mr. boston rock and rye', 'whiskey'],
         // === Brandy family ===
         ['apple brandy', 'brandy'], ['apple flavored brandy', 'brandy'],
         ['applejack', 'brandy'], ['apricot flavored brandy', 'brandy'],
@@ -421,6 +422,34 @@
             isBaseSpirit(item.name) && !isSelectedSpirit(item.name)));
         const others  = sortGroup(visible.filter(item => !isBaseSpirit(item.name)));
 
+        // Popularity is judged separately for co-spirits and modifiers so each
+        // group has a fair shot at stars. Combined cap stays ≤ 6.
+        const spiritPoolSize = state.cocktails.filter(c => c.spirit === state.baseSpirit).length;
+        const freq = item => item.spiritCount / (spiritPoolSize || 1);
+
+        const topOf = (items, threshold, cap) => new Set(
+            items
+                .map(item => ({ name: item.name, freq: freq(item) }))
+                .filter(item => item.freq >= threshold)
+                .sort((a, b) => b.freq - a.freq)
+                .slice(0, cap)
+                .map(item => item.name)
+        );
+
+        // Co-spirits: lower threshold (20%) since there are few of them and
+        // even a minority co-occurrence (e.g. brandy in gin drinks) is notable.
+        const popularSpirits = topOf(
+            universe.filter(item => isBaseSpirit(item.name) && !isSelectedSpirit(item.name)),
+            0.20, 3
+        );
+        // Modifiers: higher threshold (25%) since the pool is large and only
+        // truly dominant ingredients (lemon juice, simple syrup, etc.) deserve stars.
+        const popularModifiers = topOf(
+            universe.filter(item => !isBaseSpirit(item.name)),
+            0.25, 3
+        );
+        const popularSet = new Set([...popularSpirits, ...popularModifiers]);
+
         let clickableCount = 0;
         let idx = 0;
 
@@ -433,12 +462,15 @@
             root.appendChild(header);
 
             for (const item of items) {
+                const popular = item.clickable && popularSet.has(item.name);
+                const starHTML = popular
+                    ? `<span class="popular-star" aria-hidden="true">✦</span>` : '';
                 const btn = document.createElement('button');
                 btn.type = 'button';
-                btn.className = 'ing-btn' + (item.clickable ? '' : ' disabled');
+                btn.className = 'ing-btn' + (item.clickable ? '' : ' disabled') + (popular ? ' popular' : '');
                 btn.disabled = !item.clickable;
                 btn.style.setProperty('--i', Math.min(idx++, 40));
-                btn.innerHTML = `${escapeHTML(item.displayName)}<span class="ing-count">${item.wouldRemain}</span>`;
+                btn.innerHTML = `${escapeHTML(item.displayName)}<span class="ing-count">${item.wouldRemain}</span>${starHTML}`;
 
                 if (item.clickable) {
                     clickableCount++;
@@ -552,12 +584,17 @@
         }
 
         const selectedSet = new Set(state.selected);
+        const basePatterns = state.baseSpirit
+            ? (SPIRIT_CATEGORIES[state.baseSpirit]?.patterns || []) : [];
+        const isSelectedSpirit = name => basePatterns.some(p => p.test(name));
+
         const counts = new Map();
         for (const c of state.matching) {
             // Set per cocktail so we don't double-count repeated ingredients.
             const uniq = new Set(c.ingredients.map(i => i.name));
             for (const n of uniq) {
                 if (selectedSet.has(n)) continue;
+                if (isSelectedSpirit(n)) continue;
                 counts.set(n, (counts.get(n) || 0) + 1);
             }
         }

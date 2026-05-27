@@ -1027,6 +1027,18 @@ body {
     color: var(--disabled);
 }
 
+.ing-btn.popular {
+    background-color: rgba(107, 29, 16, 0.09);
+    border-color: rgba(140, 100, 55, 0.65);
+}
+
+.popular-star {
+    color: var(--burgundy);
+    font-size: 0.65em;
+    margin-left: 0.32rem;
+    vertical-align: middle;
+}
+
 .ing-btn.search-hidden {
     display: none;
 }
