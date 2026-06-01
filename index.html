@@ -169,13 +169,40 @@
                             <p class="picker-hint" id="picker-hint"></p>
                         </div>
                         <div class="step2-chart chart-panel">
-                            <svg class="sigil sigil-chart" aria-hidden="true"><use href="#sigil-fire"/></svg>
-                            <h2 class="section-title"><span class="section-title-text">The Ingredient Constellation</span></h2>
-                            <p class="instruction" id="chart-hint">The companions most often mixed with your current selection. Click a bar to add it.</p>
-                            <div class="chart-wrap">
-                                <svg id="chart" role="img" aria-label="Bar chart of ingredient frequencies"></svg>
-                            </div>
-                        </div>
+        		    <svg class="sigil sigil-chart" aria-hidden="true">
+            			<use href="#sigil-fire"/>
+        		    </svg>
+
+        		    <h2 class="section-title">
+            			<span class="section-title-text">
+                		    The Ingredient Constellation
+            			</span>
+        		    </h2>
+
+        		    <div class="chart-wrap">
+            			<svg id="chart"></svg>
+        		    </div>
+    			</div>
+
+    			<div class="step2-chart chart-panel">
+        		    <svg class="sigil sigil-chart" aria-hidden="true">
+            			<use href="#sigil-spirit"/>
+        		    </svg>
+
+        		    <h2 class="section-title">
+            			<span class="section-title-text">
+                		    Ingredient Popularity
+            			</span>
+        		    </h2>
+
+        		    <p class="instruction">
+            			Which ingredients appear most often in the entire cocktail archive.
+        		    </p>
+
+        		    <div class="chart-wrap">
+            			<svg id="stats-chart"></svg>
+        		    </div>
+    			</div>
                     </div>
                 </div>
 
@@ -274,8 +301,13 @@
 
         </main>
     </div>
+    <div class="chart-panel">
+	<h2>Ingredient Popularity</h2>
+	<canvas id="stats-chart"></canvas>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
     <script src="app.js"></script>
+    <script src="ingredient_stats_image.js"></script>
 </body>
 </html>
