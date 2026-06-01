@@ -693,6 +693,82 @@
             .text(d => `${d.displayName}: appears in ${d.count} of the ${state.matching.length} matching cocktails. Click to add.`);
     }
 
+function render_stats() {
+    	const svg = d3.select('#stats-chart');
+                    svg.selectAll('*').remove();
+
+    	if (!state.baseSpirit || state.selected.length === 0 || state.matching.length === 0) {
+        	    return;
+    	}
+
+	const counts = new Map();
+
+    	for (const c of state.matching) {
+	    if (c.ingredients.length === 0) continue;
+
+
+	const firstIng = c.ingredients[0].name;
+        	const display = c.ingredients[0].displayName;
+
+        	if (!counts.has(firstIng)) {
+           	    counts.set(firstIng, {
+                	    name: firstIng,
+                	    displayName: display,
+                	    count: 0
+           	    });
+             }
+
+                    counts.get(firstIng).count += 1;
+    }
+
+          const data = Array.from(counts.values())
+        .sort((a, b) => b.count - a.count)
+        	.slice(0, 12);
+
+    const margin = { top: 20, right: 40, bottom: 30, left: 180 };
+    const width = 560;
+    const barHeight = 24;
+    const gap = 8;
+    const height = margin.top + margin.bottom + data.length * (barHeight + gap);
+    svg.attr('viewBox', `0 0 ${width} ${height}`);
+    const x = d3.scaleLinear()
+        .domain([0, d3.max(data, d => d.count)])
+	.range([0, width - margin.left - margin.right])
+	.nice();
+
+    const g = svg.append('g')
+        .attr('transform', `translate(${margin.left},${margin.top})`);
+
+    const rows = g.selectAll('g')
+        .data(data)
+        .enter()
+        .append('g')
+        .attr('transform', (_, i) => `translate(0, ${i * (barHeight + gap)})`);
+
+    rows.append('text')
+        .attr('x', -10)
+	.attr('y', barHeight / 2)
+	.attr('text-anchor', 'end')
+	.attr('dominant-baseline', 'middle')
+	.attr('class', 'bar-label')	
+	.text(d => d.displayName);
+
+    rows.append('rect')
+	.attr('class', 'bar')
+	.attr('height', barHeight)
+	.attr('width', 0)
+	.transition()
+	.duration(500)
+	.attr('width', d => x(d.count));
+
+    rows.append('text')
+	.attr('x', d => x(d.count) + 6)
+	.attr('y', barHeight / 2)
+	.attr('dominant-baseline', 'middle')
+	.attr('class', 'bar-value')
+	.text(d => d.count);
+    }
+
     /* --------------------- Search filter --------------------- */
 
     function applySearchFilter(term) {
@@ -713,6 +789,7 @@
         renderStatusBar();
         renderResults();
         renderChart();
+	render_stats();
 
         const searchEl = document.getElementById('ingredient-search');
         if (searchEl) searchEl.value = '';
