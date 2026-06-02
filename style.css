@@ -1292,7 +1292,7 @@ body {
 }
 
 .bar-row .bar {
-    fill: var(--burgundy);
+    fill: var(--burgundy-bright);
     transition: fill 0.2s ease;
 }
 
@@ -1327,6 +1327,31 @@ body {
     font-size: 13px;
     font-style: italic;
     dominant-baseline: middle;
+}
+
+.stat-row .bar {
+    fill: var(--burgundy-bright);
+    transition: fill 0.2s ease;
+}
+
+.stat-row:hover .bar {
+    fill: var(--burgundy-bright);
+    filter: drop-shadow(0 0 4px rgba(138, 40, 24, 0.25));
+}
+
+.bar-title {
+    fill: var(--ink);
+    font-family: 'EB Garamond', serif;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+}
+
+.bar-subtitle {
+    fill: var(--ink-faint);
+    font-family: 'IM Fell English', serif;
+    font-size: 13px;
+    font-style: italic;
 }
 
 /* ---------- Results — vintage recipe cards ---------- */
@@ -1738,8 +1763,8 @@ body {
     height: 100%;
     width: var(--progress, 100%);
     background: linear-gradient(90deg,
-        var(--burgundy) 0%,
-        var(--gold-bright) 100%);
+            var(--burgundy) 0%,
+            var(--gold-bright) 100%);
     transition: width 0.5s ease;
 }
 
@@ -1899,6 +1924,3 @@ body {
         grid-column: auto;
     }
 }
-
-
-
