@@ -692,82 +692,117 @@
         rows.append('title')
             .text(d => `${d.displayName}: appears in ${d.count} of the ${state.matching.length} matching cocktails. Click to add.`);
     }
-
-function render_stats() {
+	function render_stats() {
     	const svg = d3.select('#stats-chart');
-                    svg.selectAll('*').remove();
+    	svg.selectAll('*').remove();
 
-    	if (!state.baseSpirit || state.selected.length === 0 || state.matching.length === 0) {
-        	    return;
+    	if (!state.baseSpirit) return;
+
+    	const baseCocktails = state.cocktails.filter(
+        	c => c.spirit === state.baseSpirit
+    	);
+
+    	const total = baseCocktails.length;
+    	if (total === 0) return;
+
+    	const basePatterns = SPIRIT_CATEGORIES[state.baseSpirit]?.patterns || [];
+    	const isCurrentBase = name => basePatterns.some(p => p.test(name));
+
+    	const counts = new Map();
+
+    	for (const c of baseCocktails) {
+        	const uniq = new Set(c.ingredients.map(i => i.name));
+
+        	for (const ing of uniq) {
+            	if (isCurrentBase(ing)) continue;
+	            counts.set(ing, (counts.get(ing) || 0) + 1);
+    	    }
     	}
 
-	const counts = new Map();
+    	const data = Array.from(counts.entries())
+        	.map(([name, count]) => ({
+            	name,
+            	displayName: state.displayNames.get(name) || name,
+            	count,
+            	percentage: 100 * count / total
+        	}))
+        	.sort((a, b) => b.percentage - a.percentage)
+        	.slice(0, 10);
 
-    	for (const c of state.matching) {
-	    if (c.ingredients.length === 0) continue;
+    	const top3Avg = d3.mean(data.slice(0, 3), d => d.percentage);
+    	const nextAvg = d3.mean(data.slice(3, 10), d => d.percentage);
+    	const gapRatio = nextAvg ? top3Avg / nextAvg : 0;
 
+    	const width = 620;
+    	const margin = { top: 78, right: 90, bottom: 30, left: 190 };
+    	const barHeight = 23;
+    	const gap = 9;
+    	const height = margin.top + margin.bottom + data.length * (barHeight + gap);
 
-	const firstIng = c.ingredients[0].name;
-        	const display = c.ingredients[0].displayName;
+    	svg.attr('viewBox', `0 0 ${width} ${height}`);
 
-        	if (!counts.has(firstIng)) {
-           	    counts.set(firstIng, {
-                	    name: firstIng,
-                	    displayName: display,
-                	    count: 0
-           	    });
-             }
+    	svg.append('text')
+        	.attr('x', 24)
+        	.attr('y', 28)
+        	.attr('class', 'bar-title')
+        	.text(`${SPIRIT_CATEGORIES[state.baseSpirit].label}: companion ingredients`);
 
-                    counts.get(firstIng).count += 1;
-    }
+    	svg.append('text')
+        	.attr('x', 24)
+        	.attr('y', 54)
+        	.attr('class', 'bar-subtitle')
+        	.text(`Top 3 average is ${gapRatio.toFixed(1)}× higher than ranks 4–10.`);
 
-          const data = Array.from(counts.values())
-        .sort((a, b) => b.count - a.count)
-        	.slice(0, 12);
+    	const x = d3.scaleLinear()
+        	.domain([0, d3.max(data, d => d.percentage)])
+        	.range([0, width - margin.left - margin.right])
+        	.nice();
 
-    const margin = { top: 20, right: 40, bottom: 30, left: 180 };
-    const width = 560;
-    const barHeight = 24;
-    const gap = 8;
-    const height = margin.top + margin.bottom + data.length * (barHeight + gap);
-    svg.attr('viewBox', `0 0 ${width} ${height}`);
-    const x = d3.scaleLinear()
-        .domain([0, d3.max(data, d => d.count)])
-	.range([0, width - margin.left - margin.right])
-	.nice();
+    	const g = svg.append('g')
+        	.attr('transform', `translate(${margin.left},${margin.top})`);
 
-    const g = svg.append('g')
-        .attr('transform', `translate(${margin.left},${margin.top})`);
+    	const rows = g.selectAll('g.stat-row')
+        	.data(data)
+        	.enter()
+        	.append('g')
+        	.attr('class', 'stat-row')
+        	.attr('transform', (_, i) => `translate(0, ${i * (barHeight + gap)})`);
 
-    const rows = g.selectAll('g')
-        .data(data)
-        .enter()
-        .append('g')
-        .attr('transform', (_, i) => `translate(0, ${i * (barHeight + gap)})`);
+    	rows.append('text')
+        	.attr('class', 'bar-label')
+        	.attr('x', -10)
+        	.attr('y', barHeight / 2)
+        	.attr('text-anchor', 'end')
+        	.attr('dominant-baseline', 'middle')
+        	.text(d =>
+            	d.displayName.length > 24
+                	? d.displayName.slice(0, 23) + '…'
+                	: d.displayName
+        	);
 
-    rows.append('text')
-        .attr('x', -10)
-	.attr('y', barHeight / 2)
-	.attr('text-anchor', 'end')
-	.attr('dominant-baseline', 'middle')
-	.attr('class', 'bar-label')	
-	.text(d => d.displayName);
+    	rows.append('rect')
+        	.attr('class', (_, i) => i < 3 ? 'bar top-bar' : 'bar')
+        	.attr('x', 0)
+        	.attr('y', 0)
+        	.attr('height', barHeight)
+        	.attr('width', 0)
+        	.transition()
+        	.duration(600)
+        	.delay((_, i) => i * 40)
+        	.attr('width', d => x(d.percentage));
 
-    rows.append('rect')
-	.attr('class', 'bar')
-	.attr('height', barHeight)
-	.attr('width', 0)
-	.transition()
-	.duration(500)
-	.attr('width', d => x(d.count));
+    	rows.append('text')
+        	.attr('class', 'bar-value')
+        	.attr('x', d => x(d.percentage) + 8)
+        	.attr('y', barHeight / 2)
+        	.attr('dominant-baseline', 'middle')
+        	.text(d => `${d.percentage.toFixed(1)}%`);
 
-    rows.append('text')
-	.attr('x', d => x(d.count) + 6)
-	.attr('y', barHeight / 2)
-	.attr('dominant-baseline', 'middle')
-	.attr('class', 'bar-value')
-	.text(d => d.count);
-    }
+    	rows.append('title')
+        	.text(d =>
+            	`${d.displayName}: appears in ${d.count} of ${total} ${SPIRIT_CATEGORIES[state.baseSpirit].label} cocktails.`
+        	);
+	}
 
     /* --------------------- Search filter --------------------- */
 
