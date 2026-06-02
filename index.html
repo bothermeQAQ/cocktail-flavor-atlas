@@ -171,7 +171,7 @@
 
 
     						<div class="step2-chart chart-panel">
-        		    			<svg class="sigil sigil-chart" aria-hidden="true">
+        		    				<svg class="sigil sigil-chart" aria-hidden="true">
             						<use href="#sigil-spirit"/>
         		    			</svg>
 
@@ -184,7 +184,10 @@
         		    			<p class="instruction">
             						Which ingredients appear most often in the entire cocktail archive.
         		    			</p>
-
+                                <div class="insight-callout" id="ingredient-insight">
+                                    <strong>Hidden Pattern:</strong>
+                                    The most common ingredients appear across many cocktail families, revealing the shared grammar behind seemingly different drinks.
+                                </div>
         		    			<div class="chart-wrap">
             						<svg id="stats-chart"></svg>
         		    			</div>
@@ -197,6 +200,15 @@
                         <span class="count-number" id="match-count">—</span>
                         <span class="count-label" id="match-label">cocktails remain in the book.</span>
                     </p>
+                    <div class="recipe-space-meter">
+                        <div class="recipe-space-meter-label">Recipe Space Remaining</div>
+                        <div class="recipe-space-meter-track">
+                            <div class="recipe-space-meter-fill" id="recipe-space-fill"></div>
+                        </div>
+                        <div class="recipe-space-meter-note" id="recipe-space-note">
+                            Narrow the cocktail universe by adding ingredients.
+                        </div>
+                    </div>
                     <button class="reset-btn" id="reset-btn" type="button">
                         ↺ &nbsp;Close the book and begin again
                     </button>
@@ -214,6 +226,10 @@
                     <svg class="sigil sigil-results" aria-hidden="true"><use href="#sigil-cup"/></svg>
                     <h2 class="section-title"><span class="section-title-text">Recipes Revealed</span></h2>
                     <p class="instruction" id="results-hint">Each card is a real recipe from the Boston Bartender's Guide.</p>
+                    <div class="insight-callout">
+                        <strong>Discovery:</strong>
+                        Every ingredient you add removes large branches of possible cocktails, exposing the hidden structure of classic recipes.
+                    </div>
                     <div class="results" id="results"></div>
                 </div>
             </section>
@@ -258,23 +274,7 @@
                 <span class="rule-line"></span>
             </div>
 
-            <section class="prototype-writeup" aria-labelledby="prototype-writeup-title">
-                <h2 id="prototype-writeup-title" class="section-title centered"><span class="section-title-text">Prototype Writeup</span></h2>
 
-                <article class="writeup-entry">
-                    <h3>What have we done so far?</h3>
-                    <p>
-                        So far, we have built a working interactive prototype for Cocktail Flavor Atlas: An Interactive Recipe Grimoire. We loaded and cleaned the TidyTuesday Boston Cocktails dataset, grouped the data into real cocktail recipes, and created a filtering system based on base spirits and ingredients. Users can choose a base spirit such as gin, rum, vodka, tequila, whiskey, brandy, or mezcal, and the page updates to show only real cocktails from the dataset that match that choice. We also implemented ingredient buttons that remain clickable only when they can still lead to at least one real cocktail, while impossible combinations become disabled. In addition, the prototype includes a D3 ingredient frequency bar chart and cocktail recipe cards that update as the user explores the recipe space. The visual design currently follows an ancient cocktail grimoire theme, using parchment, old ink, tavern-inspired colors, and recipe-book styling to support the project's story.
-                    </p>
-                </article>
-
-                <article class="writeup-entry">
-                    <h3>What will be the most challenging part to design, and why?</h3>
-                    <p>
-                        The most challenging part of our project will be designing interactions that feel meaningful rather than decorative. Our goal is not just to let users filter cocktails, but to help them understand the hidden structure behind classic drink recipes. This means we need to make the disabled ingredient states, ingredient frequency chart, and recipe cards clearly explain how the possible cocktail space narrows after each choice. Another challenge will be balancing the grimoire visual style with readability and data clarity, because an old parchment design can easily become too decorative or hard to read. We also need to decide whether to add a deeper visualization, such as an ingredient co-occurrence network or cocktail similarity map, without making the page confusing. For the final version, the design should feel like an immersive recipe book while still functioning as a clear explorable explanation.
-                    </p>
-                </article>
-            </section>
 
             <footer class="colophon">
                 <div class="colophon-mark">⁂</div>
@@ -291,9 +291,9 @@
 
     <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
     <script src="app.js"></script>
-    <script src="ingredient_bar_analysis.js"></script>
 </body>
 </html>
+
 
 
 <!--  -->

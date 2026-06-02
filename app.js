@@ -496,6 +496,8 @@
         const bar = document.getElementById('status-bar');
         const num = document.getElementById('match-count');
         const lbl = document.getElementById('match-label');
+        const fill = document.getElementById('recipe-space-fill');
+        const note = document.getElementById('recipe-space-note');
 
         if (!state.baseSpirit && state.selected.length === 0) {
             bar.hidden = true;
@@ -504,7 +506,41 @@
         bar.hidden = false;
 
         const n = state.matching.length;
-        num.textContent = n;
+        const totalUniverse = state.baseSpirit
+            ? state.cocktails.filter(c => c.spirit === state.baseSpirit).length
+            : state.cocktails.length;
+
+        const pct = totalUniverse > 0
+            ? (100 * n / totalUniverse)
+            : 0;
+
+        if (fill) {
+            fill.style.setProperty('--progress', `${pct}%`);
+        }
+
+        if (note) {
+            if (n === 0) {
+                note.textContent =
+                    'No recipes remain. Remove an ingredient to reopen the book.';
+            } else if (n === 1) {
+                note.textContent =
+                    'Only one recipe remains.';
+            } else {
+                note.textContent =
+                    `${pct.toFixed(1)}% of the recipe space remains.`;
+            }
+        }
+
+        const current = Number(num.textContent) || 0;
+        d3.select(num)
+            .transition()
+            .duration(450)
+            .tween('text', function () {
+                const interp = d3.interpolateNumber(current, n);
+                return function (t) {
+                    this.textContent = Math.round(interp(t));
+                };
+            });
         num.classList.toggle('zero', n === 0);
         if (n === 0) {
             lbl.textContent = 'cocktails fit — try lifting an ingredient.';
@@ -751,7 +787,9 @@
         	.attr('x', 24)
         	.attr('y', 54)
         	.attr('class', 'bar-subtitle')
-        	.text(`Top 3 average is ${gapRatio.toFixed(1)}× higher than ranks 4–10.`);
+        	.text(
+            	`${data[0].displayName} appears in ${data[0].percentage.toFixed(1)}% of all ${SPIRIT_CATEGORIES[state.baseSpirit].label.toLowerCase()} cocktails.`
+        	);
 
     	const x = d3.scaleLinear()
         	.domain([0, d3.max(data, d => d.percentage)])
